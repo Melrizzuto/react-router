@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import Card from "../components/Card"
+import Card from "../components/Card";
 import axios from "axios";
 import MyForm from "../components/MyForm";
 
-function Main() {
+function PostsPage() {
     const [postsList, setPostsList] = useState([]);
     const [tagsSelected, setTagsSelected] = useState([]);
-    const tagList = [];
+    const [tagList, setTagList] = useState([]);
 
     // Recupero i posts dal mio server con la mia API
     useEffect(() => {
@@ -14,11 +14,23 @@ function Main() {
             .then((res) => {
                 console.log("Posts ricevuti:", res.data.results);
                 setPostsList(res.data.results);
+
+                // gestione tags dei posts
+                const tags = res.data.results.reduce((acc, post) => {
+                    if (post.tags && Array.isArray(post.tags)) {
+                        post.tags.forEach(tag => {
+                            acc[tag] = true;
+                        });
+                    }
+                    return acc;
+                }, {});
+
+                setTagList(Object.keys(tags));
             })
             .catch(console.error);
     }, []);
 
-    // Funzione per aggiungere un post
+    /// Funzione per aggiungere un post
     const handleAddPost = (newPost) => {
         axios.post("http://localhost:3000/posts", newPost)
             .then((res) => {
@@ -40,15 +52,15 @@ function Main() {
     const handleDeletePost = (id) => {
         axios.delete(`http://localhost:3000/posts/${id}`)
             .then(() => {
-                const updatedPosts = postsList.filter((post) => post.id !== id);
-                setPostsList(updatedPosts);  // Assicurati che il set sia corretto
+                // Rimuovi il post localmente senza dover fare una nuova richiesta
+                setPostsList((prevPosts) => prevPosts.filter((post) => post.id !== id));
             })
             .catch((err) => {
                 console.error("Failed to delete post", err);
             });
     };
 
-    // Funzione per gestire i tag di un singolo post
+    // Funzione per gestire i tag selezionati
     const handleTags = (tag) => {
         setTagsSelected((prev) =>
             prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -72,7 +84,7 @@ function Main() {
                         onDelete={handleDeletePost}
                     />
                 ))}
-            {/* Componente FormContainer per gestire il form */}
+            {/* Componente MyForm per gestire il form */}
             <MyForm
                 onAddPost={handleAddPost}
                 posts={postsList}
@@ -85,4 +97,4 @@ function Main() {
     );
 }
 
-export default Main;
+export default PostsPage;
