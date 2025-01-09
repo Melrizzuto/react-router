@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function MyFormPage({ onAddPost }) {
+function MyFormPage() {
     // Stati del form
     const [formData, setFormData] = useState({
         title: "",
@@ -56,9 +56,6 @@ function MyFormPage({ onAddPost }) {
             .post("http://localhost:3000/posts", formData)
             .then((response) => {
                 console.log("Post creato:", response.data);
-
-                // passo i dati del post al componente padre
-                onAddPost(response.data);
 
                 // Reset del form
                 setFormData({
