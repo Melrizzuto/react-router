@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
-function MyForm({ onAddPost, tagList }) {
+function MyFormPage({ onAddPost }) {
     // Stati del form
     const [formData, setFormData] = useState({
         title: "",
@@ -11,6 +11,20 @@ function MyForm({ onAddPost, tagList }) {
         tags: [],
         published: true,
     });
+
+    const [tagList, setTagList] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get("http://localhost:3000/tags")
+            .then((res) => {
+                console.log("Tags ricevuti:", res.data.results);
+                setTagList(res.data.results);
+            })
+            .catch((err) => {
+                console.error("Errore nel recupero dei tag:", err);
+            });
+    }, []);
 
     // fn per gestire i cambiamenti nei campi del form
     const handleChange = (e) => {
@@ -60,6 +74,7 @@ function MyForm({ onAddPost, tagList }) {
                 console.error("Errore durante il salvataggio del post:", err);
             });
     };
+
     return (
         <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
             <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
@@ -167,4 +182,4 @@ function MyForm({ onAddPost, tagList }) {
     );
 }
 
-export default MyForm;
+export default MyFormPage;
