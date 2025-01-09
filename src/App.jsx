@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PostsPage from "./pages/PostsPage";
-import ContactPage from "./pages/ContactPage";
 import DefaultLayout from "./pages/DefaultLayout";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
@@ -11,7 +10,6 @@ function App() {
       <Routes>
         <Route Component={DefaultLayout}>
           <Route index Component={HomePage} />
-          <Route path="/contact" Component={ContactPage} />
           <Route path="/about" Component={AboutPage} />
           <Route path="/posts" Component={PostsPage} />
         </Route>
