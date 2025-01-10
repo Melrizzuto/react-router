@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function MyFormPage() {
@@ -71,7 +72,10 @@ function MyFormPage() {
                 console.error("Errore durante il salvataggio del post:", err);
             });
     };
-
+    useEffect(() => {
+        // fetch dati usando l'id
+    }, []);
+    const navigate = useNavigate();
     return (
         <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
             <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
@@ -87,6 +91,7 @@ function MyFormPage() {
                     id="title"
                     name="title"
                     value={formData.title}
+                    //obbligatoriamente devo mettere onChange  perchè devo dire a react che cambia lo stato visto che ho settato useState. altrimenti da errore e lo definisce come uncontrolled element.
                     onChange={handleChange}
                     placeholder="Inserisci il titolo del post"
                     required
@@ -156,8 +161,10 @@ function MyFormPage() {
                                 type="checkbox"
                                 className="form-check-input"
                                 id={`tag-${index}`}
+                                //la peculiarità dell attributo checkbox e che tutte le caselle hanno lo stesso nome e sarà un array di questi valori che ho checkato.
                                 name="tags"
                                 value={tag}
+                                //facciamo vedere i tags sono se è incluso nei tags
                                 checked={formData.tags.includes(tag)}
                                 onChange={handleChange}
                             />
@@ -173,6 +180,11 @@ function MyFormPage() {
             <div className="d-grid">
                 <button type="submit" className="btn btn-secondary">
                     Aggiungi
+                </button>
+                <button className="btn btn-success mt-2"
+
+                    onClick={() => navigate(-1)}>
+                    Torna alla pagina precedente
                 </button>
             </div>
         </form>

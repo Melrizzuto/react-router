@@ -21,11 +21,14 @@ function SinglePostPage() {
             console.log("finally")
         })
     }
+
+
     return (
         <section className="container" >
             <h1>Sono la pizza con id:{id}</h1>
             {/* aggiungere il post */}
             {post}
+
         </section>
     )
 }
