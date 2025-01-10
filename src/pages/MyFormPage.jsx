@@ -44,7 +44,7 @@ function MyFormPage() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        setIsLoading(true); // Mostra il loader subito
+        setIsLoading(true);
 
         axios
             .post("http://localhost:3000/posts", formData)
@@ -53,12 +53,12 @@ function MyFormPage() {
                 setTimeout(() => {
                     setIsLoading(false);
                     navigate("/posts");
-                }, 2000);
+                }, 1000);
                 setFormData(newPost);
             })
             .catch((err) => {
                 console.error("Errore durante il salvataggio del post:", err);
-                setIsLoading(false); // Nascondi il loader anche in caso di errore
+                setIsLoading(false);
             });
     };
 
