@@ -5,6 +5,7 @@ import DefaultLayout from "./pages/DefaultLayout";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import MyFormPage from "./pages/MyFormPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="add-post" Component={MyFormPage} />
           </Route>
         </Route>
+        <Route path="*" Component={NotFoundPage}></Route>
       </Routes>
     </BrowserRouter>
   );
