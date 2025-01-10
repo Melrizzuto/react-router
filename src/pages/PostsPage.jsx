@@ -3,11 +3,12 @@ import Card from "../components/Card";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
+
 function PostsPage() {
     const [postsList, setPostsList] = useState([]);
 
     // Funzione per recuperare i dati dal server
-    const getData = () => {
+    function getData() {
         axios.get("http://localhost:3000/posts")
             .then((res) => {
                 console.log("Risposta completa:", res);
@@ -17,7 +18,9 @@ function PostsPage() {
             .catch((err) => {
                 console.error("Errore nel recupero dei posts:", err);
                 setPostsList([]);
-            });
+            }).finally(() => {
+                console.log("finally")
+            })
     };
 
     // useEffect per caricare i dati al primo render

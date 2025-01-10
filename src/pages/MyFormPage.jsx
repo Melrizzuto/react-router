@@ -3,67 +3,48 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import axios from "axios";
 
-function MyFormPage() {
-    const [formData, setFormData] = useState({
-        title: "",
-        content: "",
-        image: "",
-        category: "",
-        tags: [],
-        published: true,
-    });
+const newPost = {
+    title: "",
+    content: "",
+    image: "",
+    category: "",
+    tags: [],
+    published: true,
+}
 
+function MyFormPage() {
+    const [formData, setFormData] = useState(newPost);
     const [tagList, setTagList] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // Stato per il loader
-    const [showLoader, setShowLoader] = useState(false); // Stato per il tempo minimo del loader
-    const navigate = useNavigate();
 
     useEffect(() => {
-        setShowLoader(true); // Mostra il loader immediatamente
-        const loaderTimeout = setTimeout(() => {
-            setShowLoader(false); // Nascondi il loader dopo il tempo minimo
-        }, 1000); // Tempo minimo di 1 secondo
+        getTags();
+    }, []);
+    const navigate = useNavigate();
 
+    function getTags() {
         axios
             .get("http://localhost:3000/tags")
             .then((res) => {
                 setTagList(res.data.results);
             })
-            .catch((err) => {
-                console.error("Errore nel recupero dei tag:", err);
+            .catch((error) => {
+                console.log(error);
             })
             .finally(() => {
-                clearTimeout(loaderTimeout); // Cancella il timeout in caso di successo
-                setShowLoader(false);
+                console.log("finally");
             });
-    }, []);
+    }
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    function handleChange(e) {
+        const value =
+            e.target.type === "checkbox" ? e.target.checked : e.target.value;
+        setFormData({ ...formData, [e.target.name]: value });
+    }
 
-        if (type === "checkbox") {
-            setFormData((prevData) => ({
-                ...prevData,
-                tags: checked
-                    ? [...prevData.tags, value]
-                    : prevData.tags.filter((tag) => tag !== value),
-            }));
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
-        }
-    };
-
-    const handleSubmit = (e) => {
+    function handleSubmit(e) {
         e.preventDefault();
-        setIsLoading(true);
-        setShowLoader(true);
-
-        const loaderTimeout = setTimeout(() => {
-            setShowLoader(false);
-        }, 2000);
+        setIsLoading(true); // Mostra il loader subito
 
         axios
             .post("http://localhost:3000/posts", formData)
@@ -71,32 +52,35 @@ function MyFormPage() {
                 console.log("Post creato:", response.data);
                 setTimeout(() => {
                     setIsLoading(false);
-                    navigate("/posts/");
-                }, 3000);
-
-                setFormData({
-                    title: "",
-                    content: "",
-                    image: "",
-                    category: "",
-                    tags: [],
-                    published: true,
-                });
+                    navigate("/posts");
+                }, 2000);
+                setFormData(newPost);
             })
             .catch((err) => {
                 console.error("Errore durante il salvataggio del post:", err);
-            })
-            .finally(() => {
-                clearTimeout(loaderTimeout);
-                setShowLoader(false);
-                setIsLoading(false);
+                setIsLoading(false); // Nascondi il loader anche in caso di errore
             });
     };
 
+    function handleTags(e) {
+        setFormData((formData) => {
+            let { tags, ...others } = formData;
+            if (tags.includes(e.target.value)) {
+                tags = tags.filter((val) => val !== e.target.value);
+            } else {
+                tags = [...tags, e.target.value];
+            }
+            return {
+                tags,
+                ...others,
+            };
+        });
+    }
+
     return (
         <section>
-            {/* Mostra il loader solo quando showLoader è true */}
-            {showLoader && <Loader />}
+            {/* mostro il loader solo quando isLoading è true */}
+            {isLoading && <Loader />}
 
             <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
                 <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
@@ -157,12 +141,7 @@ function MyFormPage() {
                         id="published"
                         name="published"
                         checked={formData.published}
-                        onChange={(e) =>
-                            setFormData({
-                                ...formData,
-                                published: e.target.checked,
-                            })
-                        }
+                        onChange={handleChange}
                     />
                     <label htmlFor="published" className="form-check-label">
                         Pubblica
@@ -184,7 +163,7 @@ function MyFormPage() {
                                     name="tags"
                                     value={tag}
                                     checked={formData.tags.includes(tag)}
-                                    onChange={handleChange}
+                                    onChange={handleTags}
                                 />
                                 <label className="form-check-label" htmlFor={`tag-${index}`}>
                                     {tag}
