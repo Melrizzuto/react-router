@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import style from './Card.module.css';
 
 function Card({ title, image, content, tags, published, onDelete, id }) {
@@ -37,7 +38,10 @@ function Card({ title, image, content, tags, published, onDelete, id }) {
                         </span>
                     ))}
                 </div>
-                <button className={`btn btn-warning btn-sm mt-2 gx-3 ${style.cardButton}`}>Leggi di più</button>
+                {/* Pulsante "Leggi di più" che reindirizza alla pagina del post */}
+                <Link to={`/posts/${id}`} className={`btn btn-warning btn-sm mt-2 gx-3 ${style.cardButton}`}>
+                    Leggi di più
+                </Link>
             </div>
         </div>
     ) : null;
