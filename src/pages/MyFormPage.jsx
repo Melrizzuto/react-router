@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 import axios from "axios";
 
 function MyFormPage() {
-    // Stati del form
     const [formData, setFormData] = useState({
         title: "",
         content: "",
@@ -14,12 +14,13 @@ function MyFormPage() {
     });
 
     const [tagList, setTagList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false); // Stato per il loader
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios
             .get("http://localhost:3000/tags")
             .then((res) => {
-                console.log("Tags ricevuti:", res.data.results);
                 setTagList(res.data.results);
             })
             .catch((err) => {
@@ -27,12 +28,10 @@ function MyFormPage() {
             });
     }, []);
 
-    // fn per gestire i cambiamenti nei campi del form
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
 
         if (type === "checkbox") {
-            // selezione e deselezione dei tags
             setFormData((prevData) => ({
                 ...prevData,
                 tags: checked
@@ -40,7 +39,6 @@ function MyFormPage() {
                     : prevData.tags.filter((tag) => tag !== value),
             }));
         } else {
-            // Gestisce altri campi del form
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
@@ -48,17 +46,15 @@ function MyFormPage() {
         }
     };
 
-    // Fn per gestire il submit
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
-        // Invio dati al backend
         axios
             .post("http://localhost:3000/posts", formData)
             .then((response) => {
                 console.log("Post creato:", response.data);
 
-                // Reset del form
                 setFormData({
                     title: "",
                     content: "",
@@ -70,124 +66,121 @@ function MyFormPage() {
             })
             .catch((err) => {
                 console.error("Errore durante il salvataggio del post:", err);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     };
-    useEffect(() => {
-        // fetch dati usando l'id
-    }, []);
-    const navigate = useNavigate();
+
     return (
-        <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
-            <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
+        <section>
+            {/* Mostra il loader solo quando isLoading è true */}
+            {isLoading && <Loader />}
 
-            {/* title */}
-            <div className="mb-4">
-                <label htmlFor="title" className="form-label fw-bold">
-                    <small>Titolo</small>
-                </label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="title"
-                    name="title"
-                    value={formData.title}
-                    //obbligatoriamente devo mettere onChange  perchè devo dire a react che cambia lo stato visto che ho settato useState. altrimenti da errore e lo definisce come uncontrolled element.
-                    onChange={handleChange}
-                    placeholder="Inserisci il titolo del post"
-                    required
-                />
-            </div>
+            <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
+                <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
 
-            {/* content */}
-            <div className="mb-3">
-                <label htmlFor="content" className="form-label fw-bold">
-                    <small>Contenuto</small>
-                </label>
-                <textarea
-                    className="form-control"
-                    id="content"
-                    name="content"
-                    value={formData.content}
-                    onChange={handleChange}
-                    placeholder="Inserisci il contenuto del post"
-                ></textarea>
-            </div>
-
-            {/* url img */}
-            <div className="mb-3">
-                <label htmlFor="image" className="form-label fw-bold">
-                    <small>Immagine (URL)</small>
-                </label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="image"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="Inserisci l'URL dell'immagine"
-                />
-            </div>
-
-            {/* checkbox published */}
-            <div className="form-check mb-3">
-                <input
-                    type="checkbox"
-                    className="form-check-input"
-                    id="published"
-                    name="published"
-                    checked={formData.published}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            published: e.target.checked,
-                        })
-                    }
-                />
-                <label htmlFor="published" className="form-check-label">
-                    Pubblica
-                </label>
-            </div>
-
-            {/* check tags */}
-            <div className="mb-3 ">
-                <label htmlFor="tags" className="form-label fw-bold">
-                    <small>Seleziona i tag</small>
-                </label>
-                <div className="d-flex">
-                    {tagList.map((tag, index) => (
-                        <div key={index} className="form-check mx-1">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`tag-${index}`}
-                                //la peculiarità dell attributo checkbox e che tutte le caselle hanno lo stesso nome e sarà un array di questi valori che ho checkato.
-                                name="tags"
-                                value={tag}
-                                //facciamo vedere i tags sono se è incluso nei tags
-                                checked={formData.tags.includes(tag)}
-                                onChange={handleChange}
-                            />
-                            <label className="form-check-label" htmlFor={`tag-${index}`}>
-                                {tag}
-                            </label>
-                        </div>
-                    ))}
+                {/* title */}
+                <div className="mb-4">
+                    <label htmlFor="title" className="form-label fw-bold">
+                        <small>Titolo</small>
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        placeholder="Inserisci il titolo del post"
+                        required
+                    />
                 </div>
-            </div>
 
-            {/* btn submit */}
-            <div className="d-grid">
-                <button type="submit" className="btn btn-secondary">
-                    Aggiungi
-                </button>
-                <button className="btn btn-success mt-2"
+                {/* content */}
+                <div className="mb-3">
+                    <label htmlFor="content" className="form-label fw-bold">
+                        <small>Contenuto</small>
+                    </label>
+                    <textarea
+                        className="form-control"
+                        id="content"
+                        name="content"
+                        value={formData.content}
+                        onChange={handleChange}
+                        placeholder="Inserisci il contenuto del post"
+                    ></textarea>
+                </div>
 
-                    onClick={() => navigate(-1)}>
-                    Torna alla pagina precedente
-                </button>
-            </div>
-        </form>
+                {/* url img */}
+                <div className="mb-3">
+                    <label htmlFor="image" className="form-label fw-bold">
+                        <small>Immagine (URL)</small>
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="image"
+                        name="image"
+                        value={formData.image}
+                        onChange={handleChange}
+                        placeholder="Inserisci l'URL dell'immagine"
+                    />
+                </div>
+
+                {/* checkbox published */}
+                <div className="form-check mb-3">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="published"
+                        name="published"
+                        checked={formData.published}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                published: e.target.checked,
+                            })
+                        }
+                    />
+                    <label htmlFor="published" className="form-check-label">
+                        Pubblica
+                    </label>
+                </div>
+
+                {/* check tags */}
+                <div className="mb-3">
+                    <label htmlFor="tags" className="form-label fw-bold">
+                        <small>Seleziona i tag</small>
+                    </label>
+                    <div className="d-flex">
+                        {tagList.map((tag, index) => (
+                            <div key={index} className="form-check mx-1">
+                                <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    id={`tag-${index}`}
+                                    name="tags"
+                                    value={tag}
+                                    checked={formData.tags.includes(tag)}
+                                    onChange={handleChange}
+                                />
+                                <label className="form-check-label" htmlFor={`tag-${index}`}>
+                                    {tag}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* btn submit */}
+                <div className="d-grid">
+                    <button type="submit" className="btn btn-secondary" onClick={() => navigate(-1)}>
+                        Aggiungi
+                    </button>
+                </div>
+            </form>
+        </section>
     );
 }
 

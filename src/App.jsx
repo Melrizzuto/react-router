@@ -20,6 +20,7 @@ function App() {
             <Route path="add-post" Component={MyFormPage} />
           </Route>
         </Route>
+        {/* rotta di fallback per gestire url e pagini non presenti */}
         <Route path="*" Component={NotFoundPage}></Route>
       </Routes>
     </BrowserRouter>
