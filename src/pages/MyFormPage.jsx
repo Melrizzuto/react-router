@@ -15,9 +15,15 @@ function MyFormPage() {
 
     const [tagList, setTagList] = useState([]);
     const [isLoading, setIsLoading] = useState(false); // Stato per il loader
+    const [showLoader, setShowLoader] = useState(false); // Stato per il tempo minimo del loader
     const navigate = useNavigate();
 
     useEffect(() => {
+        setShowLoader(true); // Mostra il loader immediatamente
+        const loaderTimeout = setTimeout(() => {
+            setShowLoader(false); // Nascondi il loader dopo il tempo minimo
+        }, 1000); // Tempo minimo di 1 secondo
+
         axios
             .get("http://localhost:3000/tags")
             .then((res) => {
@@ -25,6 +31,10 @@ function MyFormPage() {
             })
             .catch((err) => {
                 console.error("Errore nel recupero dei tag:", err);
+            })
+            .finally(() => {
+                clearTimeout(loaderTimeout); // Cancella il timeout in caso di successo
+                setShowLoader(false);
             });
     }, []);
 
@@ -49,11 +59,20 @@ function MyFormPage() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setShowLoader(true);
+
+        const loaderTimeout = setTimeout(() => {
+            setShowLoader(false);
+        }, 2000);
 
         axios
             .post("http://localhost:3000/posts", formData)
             .then((response) => {
                 console.log("Post creato:", response.data);
+                setTimeout(() => {
+                    setIsLoading(false);
+                    navigate("/posts/");
+                }, 3000);
 
                 setFormData({
                     title: "",
@@ -68,14 +87,16 @@ function MyFormPage() {
                 console.error("Errore durante il salvataggio del post:", err);
             })
             .finally(() => {
+                clearTimeout(loaderTimeout);
+                setShowLoader(false);
                 setIsLoading(false);
             });
     };
 
     return (
         <section>
-            {/* Mostra il loader solo quando isLoading è true */}
-            {isLoading && <Loader />}
+            {/* Mostra il loader solo quando showLoader è true */}
+            {showLoader && <Loader />}
 
             <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
                 <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
@@ -175,7 +196,7 @@ function MyFormPage() {
 
                 {/* btn submit */}
                 <div className="d-grid">
-                    <button type="submit" className="btn btn-secondary" onClick={() => navigate(-1)}>
+                    <button type="submit" className="btn btn-secondary">
                         Aggiungi
                     </button>
                 </div>
