@@ -1,10 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AlertContext } from "../context/AlertContext";
 import axios from "axios";
 
 function SinglePostPage() {
     const { id } = useParams();
     const [post, setPost] = useState(null);
+
+    // devo specificare il contesto dove voglio utilizzarlo in questo caso GlobalContext. Mi ritorna un oggetto che possiamo destrutturarlo e utilizzarlo.
+    const { alert, setAlert } = useContext(AlertContext)
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -18,7 +22,7 @@ function SinglePostPage() {
             }).finally(() => {
                 console.log("finally");
             });
-    }, [id]); //dipendenza
+    },); //dipendenza
 
     //se non ci sono i dati non renderizzo nulla
     if (!post) {

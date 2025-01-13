@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
+import { useTagContext } from "../context/TagContext"; //importo il contesto di tag
 import axios from "axios";
 
 const newPost = {
@@ -10,31 +11,13 @@ const newPost = {
     category: "",
     tags: [],
     published: true,
-}
+};
 
 function MyFormPage() {
     const [formData, setFormData] = useState(newPost);
-    const [tagList, setTagList] = useState([]);
-    const [isLoading, setIsLoading] = useState(false); // Stato per il loader
-
-    useEffect(() => {
-        getTags();
-    }, []);
+    const [isLoading, setIsLoading] = useState(false);
+    const { tagList } = useTagContext();
     const navigate = useNavigate();
-
-    function getTags() {
-        axios
-            .get("http://localhost:3000/tags")
-            .then((res) => {
-                setTagList(res.data.results);
-            })
-            .catch((error) => {
-                console.log(error);
-            })
-            .finally(() => {
-                console.log("finally");
-            });
-    }
 
     function handleChange(e) {
         const value =
@@ -60,7 +43,7 @@ function MyFormPage() {
                 console.error("Errore durante il salvataggio del post:", err);
                 setIsLoading(false);
             });
-    };
+    }
 
     function handleTags(e) {
         setFormData((formData) => {
@@ -79,11 +62,15 @@ function MyFormPage() {
 
     return (
         <section>
-            {/* mostro il loader solo quando isLoading è true */}
             {isLoading && <Loader />}
 
-            <form onSubmit={handleSubmit} className="p-4 rounded shadow-lg bg-light m-auto my-2">
-                <h4 className="mb-1 text-center text-secondary">Aggiungi un nuovo post</h4>
+            <form
+                onSubmit={handleSubmit}
+                className="p-4 rounded shadow-lg bg-light m-auto my-2"
+            >
+                <h4 className="mb-1 text-center text-secondary">
+                    Aggiungi un nuovo post
+                </h4>
 
                 {/* title */}
                 <div className="mb-4">
