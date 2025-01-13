@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -6,6 +6,7 @@ function SinglePostPage() {
     const { id } = useParams();
     const [post, setPost] = useState(null);
 
+    const navigate = useNavigate();
     useEffect(() => {
         axios.get(`http://localhost:3000/posts/${id}`)
             .then((response) => {
@@ -13,6 +14,7 @@ function SinglePostPage() {
                 setPost(response.data.item);
             }).catch((error) => {
                 console.log(error);
+                navigate("/errors")
             }).finally(() => {
                 console.log("finally");
             });
