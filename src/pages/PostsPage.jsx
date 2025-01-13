@@ -41,7 +41,7 @@ function PostsPage() {
     };
 
     return (
-        <main className="container d-flex flex-wrap justify-content-center p-4 mt-4">
+        <main className="container d-flex flex-wrap justify-content-center align-content-center p-4 mt-4">
             {/* Messaggio se non ci sono post */}
             {postsList.length === 0 && (
                 <p className="text-center">Nessun post disponibile.</p>

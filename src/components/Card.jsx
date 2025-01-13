@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import style from './Card.module.css';
 
-function Card({ title, image, content, tags, published, onDelete, id }) {
+function Card({ title, image, content, tags = [], published, onDelete, id }) {
 
     // imgs di default se non c'è
     const defaultImage = 'https://placehold.co/600x400';
@@ -32,11 +32,15 @@ function Card({ title, image, content, tags, published, onDelete, id }) {
                 <h5 className="card-title">{title}</h5>
                 <p className="card-text">{content}</p>
                 <div>
-                    {tags.map((tag, index) => (
-                        <span key={index} className={`badge bg-${tagColors[tag] || 'secondary'} me-2 mb-2`}>
-                            {tag}
-                        </span>
-                    ))}
+                    {Array.isArray(tags) && tags.length > 0 ? (
+                        tags.map((tag, index) => (
+                            <span key={index} className={`badge bg-${tagColors[tag] || 'secondary'} me-2 mb-2`}>
+                                {tag}
+                            </span>
+                        ))
+                    ) : (
+                        <span className="badge bg-secondary me-2 mb-2">No tags</span>
+                    )}
                 </div>
                 {/* Pulsante "Leggi di più" che reindirizza alla pagina del post */}
                 <Link to={`/posts/${id}`} className={`btn btn-warning btn-sm mt-2 gx-3 ${style.cardButton}`}>

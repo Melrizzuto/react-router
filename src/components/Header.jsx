@@ -31,6 +31,7 @@ function Navbar() {
                                 <NavLink
                                     className="nav-link"
                                     to={item.path}
+                                    end
                                     style={({ isActive }) => ({
                                         color: isActive ? "red" : "black"
                                     })}
